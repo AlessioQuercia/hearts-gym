@@ -71,14 +71,28 @@ class RewardFunction:
 
         # First trick: highest card
         if self.game.prev_was_first_trick:
-            # reward += self.game.prev_table_cards[player_index].rank / 11
             return self.game.prev_table_cards[player_index].rank / 11
 
         # If lead of trick: lowest card
-        # if self.game.prev_table_cards[player_index]
+        if self.game.prev_table_cards[0] in self.game.prev_hands[player_index]
+            return 1 - self.game.prev_table_cards[player_index].rank / 11
+        # If not lead
+        else:
+            unzipped_object = zip(*self.game.prev_hands[player_index])
+            prev_hand_suits = list(unzipped_object)
+            # If not suit: highest hearth card (pref: Spade Queen --> heart --> other)
+            if self.game.leading_suit not in prev_hand_suits:
+                played_card = self.game.prev_table_cards[player_index]
+                # Spade Queen
+                if played_card.suit == 3 and player_card.rank == 9:
+                    return 5
+                # Hearth + highest card
+                else:
+                    multiplier = 1
+                    if played_card.suit == 2:
+                        multiplier = 2
+                    return self.game.prev_table_cards[player_index].rank / 11 * multiplier
 
-        # If last of trick and not matching: highest hearth card
-        # if self.prev_table_cards:
 
         # penalty = self.game.penalties[player_index]
 
@@ -88,5 +102,7 @@ class RewardFunction:
         if self.game.prev_trick_winner_index == player_index:
             assert self.game.prev_trick_penalty is not None
             return -self.game.prev_trick_penalty
+        else:
+            reward += 1
         return 1
         # return -penalty
