@@ -6,16 +6,16 @@ from hearts_gym import utils
 
 assert utils.DEFAULT_FRAMEWORK is not None
 
-RESULTS_DIR = './results'
+RESULTS_DIR = "./results"
 
-ENV_NAME = 'Hearts-v0'
+ENV_NAME = "Hearts-v0"
 
 LEARNED_AGENT_ID = 0
 """Agent ID of the learned policy."""
 
-LEARNED_POLICY_ID = 'learned'
-RANDOM_POLICY_ID = 'random'
-RULEBASED_POLICY_ID = 'rulebased'
+LEARNED_POLICY_ID = "learned"
+RANDOM_POLICY_ID = "random"
+RULEBASED_POLICY_ID = "rulebased"
 
 
 allow_pickles = True
@@ -45,7 +45,7 @@ seed = 0
 mask_actions = True
 
 policy_mapping_fn = utils.create_policy_mapping(
-    'all_learned',
+    "all_learned",
     # 'one_learned_rest_random',
     LEARNED_AGENT_ID,
     LEARNED_POLICY_ID,
@@ -61,7 +61,7 @@ random_policy_seed = None
 eval_seed = seed + 1
 num_test_games = 5000
 eval_policy_mapping_fn = utils.create_policy_mapping(
-    'one_learned_rest_random',
+    "one_learned_rest_random",
     LEARNED_AGENT_ID,
     LEARNED_POLICY_ID,
     RANDOM_POLICY_ID,
@@ -79,45 +79,46 @@ it may sometimes even offer better support.
 
 # RLLib config
 
-algorithm = 'PPO'
+algorithm = "PPO"
 checkpoint_path: Optional[str] = None
 """Path of a checkpoint to load. Use `None` to not load a checkpoint."""
 resume = False
 """Whether to resume the most recent run."""
 
 env_config = {
-    'num_players': num_players,
-    'deck_size': deck_size,
-    'seed': seed,
-    'mask_actions': mask_actions,
+    "num_players": num_players,
+    "deck_size": deck_size,
+    "seed": seed,
+    "mask_actions": mask_actions,
 }
 
 model_config = {
     # 'use_lstm': True,
     # 'use_attention': True,
-    'max_seq_len': deck_size // num_players,
-    'custom_model': None,
+    "max_seq_len": deck_size // num_players,
+    "custom_model": None,
 }
 
 
 # Tune config
 
-opt_metric: str = 'episode_reward_mean'
-opt_mode: str = 'max'
+opt_metric: str = "episode_reward_mean"
+opt_mode: str = "max"
 
-stop_config = {
-    'timesteps_total': 2000000,
-}
+# stop_config = {
+#     "timesteps_total": 2000000,
+# }
+stop_config = {"training_iteration": 20}
 
 scheduler = tune.schedulers.FIFOScheduler()
 
 config = {
-    'env': ENV_NAME,
-    'env_config': env_config,
-    'model': model_config,
-    'multiagent': {
-        'policies_to_train': [LEARNED_POLICY_ID],
-        'policies': {
+    "env": ENV_NAME,
+    "env_config": env_config,
+    "model": model_config,
+    "multiagent": {
+        "policies_to_train": [LEARNED_POLICY_ID],
+        "policies": {
             **utils.default_policies(
                 ENV_NAME,
                 env_config,
@@ -127,17 +128,14 @@ config = {
                 random_policy_seed,
             ),
             **utils.create_custom_rulebased_policies(
-                ENV_NAME,
-                env_config,
-                custom_rulebased_policies,
+                ENV_NAME, env_config, custom_rulebased_policies,
             ),
         },
-        'policy_mapping_fn': policy_mapping_fn,
+        "policy_mapping_fn": policy_mapping_fn,
     },
-    'num_gpus': utils.get_num_gpus(framework),
-    'num_workers': utils.get_num_cpus() - 1,
-    'framework': framework,
-
+    "num_gpus": utils.get_num_gpus(framework),
+    "num_workers": utils.get_num_cpus() - 1,
+    "framework": framework,
     # 'lr': 3e-4,
     # 'gamma': 0.999,
     # 'sgd_minibatch_size': 512,
