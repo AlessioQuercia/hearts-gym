@@ -23,10 +23,7 @@ class RewardFunction:
         return self.compute_reward(*args, **kwargs)
 
     def compute_reward(
-            self,
-            player_index: int,
-            prev_active_player_index: int,
-            trick_is_over: bool,
+        self, player_index: int, prev_active_player_index: int, trick_is_over: bool,
     ) -> Reward:
         """Return the reward for the player with the given index.
 
@@ -49,6 +46,16 @@ class RewardFunction:
         Returns:
             Reward: Reward for the player with the given index.
         """
+        reward = 0
+        # print("Player_idx", player_index)
+        # if len(self.game.prev_table_cards) > 3:
+        #     print("Played_card", self.game.prev_table_cards[player_index])
+        # print("Prev. Hands", self.game.prev_hands[player_index])
+        # print("Prev. Table", self.game.prev_table_cards)
+        # # exit(1)
+        # if len(self.game.hands[player_index]) < 10:
+        #     exit(1)
+
         if self.game.prev_was_illegals[player_index]:
             return -self.game.max_penalty * self.game.max_num_cards_on_hand
 
@@ -61,6 +68,17 @@ class RewardFunction:
 
         if trick_is_over and self.game.has_shot_the_moon(player_index):
             return self.game.max_penalty * self.game.max_num_cards_on_hand
+
+        # First trick: highest card
+        if self.game.prev_was_first_trick:
+            # reward += self.game.prev_table_cards[player_index].rank / 11
+            return self.game.prev_table_cards[player_index].rank / 11
+
+        # If lead of trick: lowest card
+        # if self.game.prev_table_cards[player_index]
+
+        # If last of trick and not matching: highest hearth card
+        # if self.prev_table_cards:
 
         # penalty = self.game.penalties[player_index]
 

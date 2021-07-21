@@ -8,7 +8,7 @@ from typing import List, Union
 
 from hearts_gym.utils.typing import Seed
 
-unicode_level = 1
+unicode_level = 0
 """Default for how advanced the unicode used for printing cards
 should be.
 """
@@ -28,7 +28,7 @@ class Card:
     ranks are compared.
     """
 
-    __slots__ = ['suit', 'rank']
+    __slots__ = ["suit", "rank"]
 
     NUM_SUITS = 4
 
@@ -43,11 +43,11 @@ class Card:
     # Finally, the highest-valued card with value 12 is the ace.
     MAX_RANK = 12
 
-    SUITS = ['C', 'D', 'H', 'S']
-    RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+    SUITS = ["C", "D", "H", "S"]
+    RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 
-    UNICODE_SUITS = ['♣', '♢', '♡', '♠']
-    UNICODE_CARDS_START = [0x1f0d1, 0x1f0c1, 0x1f0b1, 0x1f0a1]
+    UNICODE_SUITS = ["♣", "♢", "♡", "♠"]
+    UNICODE_CARDS_START = [0x1F0D1, 0x1F0C1, 0x1F0B1, 0x1F0A1]
 
     def __init__(self, suit: int, rank: int) -> None:
         """Construct a card with the suit and rank.
@@ -71,15 +71,19 @@ class Card:
         if not isinstance(other, Card):
             return NotImplemented
 
-        return (self.suit < other.suit
-                or self.suit == other.suit and self.rank < other.rank)
+        return (
+            self.suit < other.suit or self.suit == other.suit and self.rank < other.rank
+        )
 
     def __le__(self, other: object) -> bool:
         if not isinstance(other, Card):
             return NotImplemented
 
-        return (self.suit < other.suit
-                or self.suit == other.suit and self.rank <= other.rank)
+        return (
+            self.suit < other.suit
+            or self.suit == other.suit
+            and self.rank <= other.rank
+        )
 
     def as_str(self, unicode_level: int = unicode_level) -> str:
         """Return self as a string.
@@ -111,19 +115,15 @@ class Card:
         return self.as_str(unicode_level)
 
     def __repr__(self) -> str:
-        return 'Card(' + str(self.suit) + ', ' + str(self.rank) + ')'
+        return "Card(" + str(self.suit) + ", " + str(self.rank) + ")"
 
 
 class Deck:
     """A standard playing card deck."""
+
     MAX_SIZE = 52
 
-    def __init__(
-            self,
-            size: int,
-            build_ordered: bool,
-            seed: Seed = None,
-    ) -> None:
+    def __init__(self, size: int, build_ordered: bool, seed: Seed = None,) -> None:
         """Construct a pre-shuffled card deck with a given size.
 
         If the size is not divisible by the number of suits, meaning
@@ -142,8 +142,7 @@ class Deck:
                 if `size` is less than `Deck.MAX_SIZE`).
             seed (Seed): Random number generator seed.
         """
-        assert 0 < size <= self.MAX_SIZE, \
-            f'deck size must be in (0, {self.MAX_SIZE}]'
+        assert 0 < size <= self.MAX_SIZE, f"deck size must be in (0, {self.MAX_SIZE}]"
 
         self._rng = random.Random(seed)
         self._build_ordered = build_ordered
@@ -166,14 +165,11 @@ class Deck:
                 Card(suit, rank)
                 for suit in range(Card.NUM_SUITS)
                 for rank in range(
-                        (
-                            Card.NUM_RANKS
-                            - (
-                                min_num_cards_per_suit
-                                + (suit >= smallest_larger_suit)
-                            )
-                        ),
-                        Card.NUM_RANKS,
+                    (
+                        Card.NUM_RANKS
+                        - (min_num_cards_per_suit + (suit >= smallest_larger_suit))
+                    ),
+                    Card.NUM_RANKS,
                 )
             ]
 
@@ -189,7 +185,7 @@ class Deck:
         return len(self._deck)
 
     def __str__(self) -> str:
-        return '[' + ', '.join(str(card) for card in self._deck) + ']'
+        return "[" + ", ".join(str(card) for card in self._deck) + "]"
 
     def __repr__(self) -> str:
         return str(self._deck)
@@ -245,8 +241,8 @@ class Deck:
         for card in cards:
             remove_index = bisect.bisect_left(self._used_cards, card)
             if (
-                    remove_index >= len(self._used_cards)
-                    or self._used_cards[remove_index] != card
+                remove_index >= len(self._used_cards)
+                or self._used_cards[remove_index] != card
             ):
                 continue
             del self._used_cards[remove_index]
