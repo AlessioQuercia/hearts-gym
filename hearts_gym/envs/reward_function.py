@@ -46,7 +46,6 @@ class RewardFunction:
         Returns:
             Reward: Reward for the player with the given index.
         """
-        reward = 0
         # print("Player_idx", player_index)
         # if len(self.game.prev_table_cards) > 3:
         #     print("Played_card", self.game.prev_table_cards[player_index])
@@ -56,27 +55,60 @@ class RewardFunction:
         # if len(self.game.hands[player_index]) < 10:
         #     exit(1)
 
+        reward = 1
+
+        # Illegal action
         if self.game.prev_was_illegals[player_index]:
-            return -self.game.max_penalty * self.game.max_num_cards_on_hand
+            # reward = -self.game.max_penalty * self.game.max_num_cards_on_hand
+            reward = -self.game.max_penalty
 
         card = self.game.prev_played_cards[player_index]
 
+        # The agent did not take a turn until now; no information to provide.
         if card is None:
-            # The agent did not take a turn until now; no information
-            # to provide.
-            return 0
+            reward = 0
 
+        # Shot to the moon
         if trick_is_over and self.game.has_shot_the_moon(player_index):
-            return self.game.max_penalty * self.game.max_num_cards_on_hand
+            # reward = self.game.max_penalty * self.game.max_num_cards_on_hand
+            reward = self.game.max_penalty
 
+        ################ Current table ###################
+        # If leading suit is heart
+        if len(self.game.table_cards) > 0:
+            if self.game.leading_suit == 2:
+                table_ranks = [
+                    card.rank for card in self.game.table_cards if card.suit == 2
+                ]
+                max_heart_rank = max(table_ranks)
+                played_card = self.game.table_cards[player_index]
+                if played_card.rank > max_heart_rank:
+                    reward = -played_card.rank / 11
+                else:
+                    reward = played_card.rank / 11
+
+        # If leading suit is spade
+        if len(self.game.table_cards) > 0:
+            if self.game.leading_suit == 3:
+                table_ranks = [
+                    card.rank for card in self.game.table_cards if card.suit == 3
+                ]
+                if 10 in table_ranks:
+                    played_card = self.game.table_cards[player_index]
+                    if played_card.rank > 10:
+                        reward = -self.game.max_penalty
+                    else:
+                        reward = played_card.rank / 11
+
+        ################ Previous table ##################
         # First trick: highest card
         if self.game.prev_was_first_trick:
-            return self.game.prev_table_cards[player_index].rank / 11
+            reward = 1 + self.game.prev_table_cards[player_index].rank / 11
 
         # If lead of trick: lowest card
         if len(self.game.prev_table_cards) > 0:
             if self.game.prev_table_cards[0] in self.game.prev_hands[player_index]:
-                return 1 - self.game.prev_table_cards[player_index].rank / 11
+                reward = 1 + 1 - self.game.prev_table_cards[player_index].rank / 11
             # If not lead
             else:
                 prev_hand_suits = [
@@ -86,15 +118,16 @@ class RewardFunction:
                 if self.game.leading_suit not in prev_hand_suits:
                     played_card = self.game.prev_table_cards[player_index]
                     # Spade Queen
-                    if played_card.suit == 3 and played_card.rank == 9:
-                        return 5
+                    if played_card.suit == 3 and played_card.rank == 10:
+                        reward = self.game.max_penalty
                     # Hearth + highest card
                     else:
                         multiplier = 1
                         if played_card.suit == 2:
                             multiplier = 2
-                        return (
-                            self.game.prev_table_cards[player_index].rank
+                        reward = (
+                            1
+                            + self.game.prev_table_cards[player_index].rank
                             / 11
                             * multiplier
                         )
@@ -106,8 +139,9 @@ class RewardFunction:
 
         if self.game.prev_trick_winner_index == player_index:
             assert self.game.prev_trick_penalty is not None
-            return -self.game.prev_trick_penalty
-        else:
-            reward += 1
-        return 1
+            reward = -self.game.prev_trick_penalty
+
+        # Normalize between -1 and 1
+        reward = reward / self.game.max_penalty
+        return reward
         # return -penalty

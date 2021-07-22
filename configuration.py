@@ -59,7 +59,7 @@ random_policy_seed = None
 # Test config
 
 eval_seed = seed + 1
-num_test_games = 5000
+num_test_games = 100
 eval_policy_mapping_fn = utils.create_policy_mapping(
     "one_learned_rest_random",
     LEARNED_AGENT_ID,
@@ -139,4 +139,5 @@ config = {
     # 'lr': 3e-4,
     # 'gamma': 0.999,
     # 'sgd_minibatch_size': 512,
+    "seed": 42,
 }
