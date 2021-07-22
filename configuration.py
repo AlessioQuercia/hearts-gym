@@ -137,7 +137,7 @@ config = {
     "num_workers": utils.get_num_cpus() - 1,
     "framework": framework,
     # 'lr': 3e-4,
-    # 'gamma': 0.999,
+    "gamma": 0.9,
     # 'sgd_minibatch_size': 512,
     "seed": 42,
 }
