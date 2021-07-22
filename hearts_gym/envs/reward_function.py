@@ -46,12 +46,22 @@ class RewardFunction:
         Returns:
             Reward: Reward for the player with the given index.
         """
+
+        # index = self.env.get_offset_indices(
+        #     np.array([player_index]),
+        #     self.game.leading_player_index,
+        #     self.game.num_players,
+        # )[0]
+
         # print("Player_idx", player_index)
+        # print("Player_rel_idx", index)
+        # print("Curr_Played_card", self.game.table_cards[index])
         # if len(self.game.prev_table_cards) > 3:
-        #     print("Played_card", self.game.prev_table_cards[player_index])
+        #     print("Prev_Played_card", self.game.prev_table_cards[player_index])
         # print("Prev. Hands", self.game.prev_hands[player_index])
+        # print("Curr. Table", self.game.table_cards)
         # print("Prev. Table", self.game.prev_table_cards)
-        # # exit(1)
+        # exit(1)
         # if len(self.game.hands[player_index]) < 10:
         #     exit(1)
 
@@ -73,28 +83,27 @@ class RewardFunction:
             # reward = self.game.max_penalty * self.game.max_num_cards_on_hand
             reward = self.game.max_penalty
 
-        ################ Current table ###################
-        # If leading suit is heart
-        if len(self.game.table_cards) > 0:
-            if self.game.leading_suit == 2:
+        ################ Prev Current table ###################
+        if len(self.game.prev_table_cards) > player_index:
+            played_card = self.game.prev_table_cards[player_index]
+            # If leading suit is heart
+            if self.game.prev_leading_suit == 2:
                 table_ranks = [
-                    card.rank for card in self.game.table_cards if card.suit == 2
+                    card.rank for card in self.game.prev_table_cards if card.suit == 2
                 ]
                 max_heart_rank = max(table_ranks)
-                played_card = self.game.table_cards[player_index]
+
                 if played_card.rank > max_heart_rank:
                     reward = -played_card.rank / 11
                 else:
                     reward = played_card.rank / 11
 
-        # If leading suit is spade
-        if len(self.game.table_cards) > 0:
-            if self.game.leading_suit == 3:
+            # If leading suit is spade
+            if self.game.prev_leading_suit == 3:
                 table_ranks = [
-                    card.rank for card in self.game.table_cards if card.suit == 3
+                    card.rank for card in self.game.prev_table_cards if card.suit == 3
                 ]
                 if 10 in table_ranks:
-                    played_card = self.game.table_cards[player_index]
                     if played_card.rank > 10:
                         reward = -self.game.max_penalty
                     else:
