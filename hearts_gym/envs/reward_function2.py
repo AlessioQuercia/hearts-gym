@@ -106,7 +106,7 @@ class RewardFunction:
                     else:
                         multiplier = 1
                         if played_card.suit == 2:
-                            multiplier = 5
+                            multiplier = 2
                         reward += (
                             1
                             + self.game.prev_table_cards[player_index].rank

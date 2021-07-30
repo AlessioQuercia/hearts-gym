@@ -59,7 +59,7 @@ random_policy_seed = None
 # Test config
 
 eval_seed = seed + 1
-num_test_games = 100
+num_test_games = 5000
 eval_policy_mapping_fn = utils.create_policy_mapping(
     "one_learned_rest_random",
     LEARNED_AGENT_ID,
@@ -80,6 +80,7 @@ it may sometimes even offer better support.
 # RLLib config
 
 algorithm = "PPO"
+# algorithm = "DQN"
 checkpoint_path: Optional[str] = None
 """Path of a checkpoint to load. Use `None` to not load a checkpoint."""
 resume = False
@@ -93,10 +94,12 @@ env_config = {
 }
 
 model_config = {
-    # 'use_lstm': True,
-    # 'use_attention': True,
+    # "use_lstm": True,
+    "use_attention": True,
     "max_seq_len": deck_size // num_players,
     "custom_model": None,
+    # "fcnet_hiddens": [256, 256],
+    # "fcnet_activation": "relu",  # default: tanh
 }
 
 
@@ -108,7 +111,7 @@ opt_mode: str = "max"
 # stop_config = {
 #     "timesteps_total": 2000000,
 # }
-stop_config = {"training_iteration": 20}
+stop_config = {"training_iteration": 1000}
 
 scheduler = tune.schedulers.FIFOScheduler()
 
